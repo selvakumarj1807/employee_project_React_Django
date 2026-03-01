@@ -1,0 +1,216 @@
+{
+  "info": {
+    "name": "Employee Management System API",
+    "_postman_id": "b7a9c1f2-1234-4567-890a-emsapi",
+    "description": "Postman Collection for Employee Management System with JWT Authentication",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register User",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Test@123\"\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/auth/register/",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["api", "auth", "register", ""]
+        }
+      }
+    },
+    {
+      "name": "Login (JWT)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"Test@123\"\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/auth/login/",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["api", "auth", "login", ""]
+        }
+      }
+    },
+    {
+      "name": "Refresh Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refresh\": \"<paste_refresh_token_here>\"\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/auth/refresh/",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["api", "auth", "refresh", ""]
+        }
+      }
+    },
+    {
+      "name": "Get Profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer <access_token_here>" }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/auth/profile/",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["api", "auth", "profile", ""]
+        }
+      }
+    },
+    {
+      "name": "Change Password",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer <access_token_here>" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"old_password\": \"Test@123\",\n  \"new_password\": \"NewPass@123\"\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/auth/change-password/",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["api", "auth", "change-password", ""]
+        }
+      }
+    },
+    {
+      "name": "Create Dynamic Form",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer <access_token_here>" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Employee Basic Form\",\n  \"fields\": [\n    {\"label\": \"First Name\", \"field_type\": \"text\"},\n    {\"label\": \"Age\", \"field_type\": \"number\"},\n    {\"label\": \"Date of Joining\", \"field_type\": \"date\"}\n  ]\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/forms/",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["api", "forms", ""]
+        }
+      }
+    },
+    {
+      "name": "List Forms",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer <access_token_here>" }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/forms/",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["api", "forms", ""]
+        }
+      }
+    },
+    {
+      "name": "Create Employee",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer <access_token_here>" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"form\": 1,\n  \"data\": {\n    \"First Name\": \"John\",\n    \"Age\": 28,\n    \"Date of Joining\": \"2024-01-01\"\n  }\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/employees/",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["api", "employees", ""]
+        }
+      }
+    },
+    {
+      "name": "List Employees",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer <access_token_here>" }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/employees/",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["api", "employees", ""]
+        }
+      }
+    },
+    {
+      "name": "Search Employees",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer <access_token_here>" }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/employees/?search=John",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["api", "employees", ""],
+          "query": [
+            { "key": "search", "value": "John" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Delete Employee",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer <access_token_here>" }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/employees/1/",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["api", "employees", "1", ""]
+        }
+      }
+    }
+  ]
+}
