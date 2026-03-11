@@ -1,34 +1,27 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { useNavigate, Link } from "react-router-dom";
 
-function Login() {
+function Register() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
     username: "",
+    email: "",
     password: "",
   });
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
-  const handleLogin = async () => {
-    setError("");
+  const register = async () => {
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        "http://127.0.0.1:8000/api/auth/login/",
-        form
-      );
-
-      localStorage.setItem("access", res.data.access);
-      localStorage.setItem("refresh", res.data.refresh);
-
-      navigate("/dashboard");
+      await api.post("auth/register/", form);
+      alert("Registration Successful");
+      navigate("/");
     } catch {
-      setError("Invalid username or password");
+      alert("Registration Failed");
     } finally {
       setLoading(false);
     }
@@ -60,12 +53,6 @@ function Login() {
         border-radius:16px;
         padding:40px 30px;
         box-shadow:0 15px 40px rgba(0,0,0,.2);
-        animation:fade .4s ease;
-      }
-
-      @keyframes fade{
-        from{opacity:0;transform:translateY(15px)}
-        to{opacity:1;transform:translateY(0)}
       }
 
       .title{
@@ -82,7 +69,6 @@ function Login() {
         border-radius:10px;
         border:1px solid #ddd;
         margin-bottom:15px;
-        font-size:14px;
       }
 
       .input:focus{
@@ -106,21 +92,9 @@ function Login() {
         transform:translateY(-2px);
       }
 
-      .btn:disabled{
-        opacity:.7;
-      }
-
-      .error{
-        color:red;
-        text-align:center;
-        margin-bottom:10px;
-        font-size:14px;
-      }
-
       .switch{
         text-align:center;
         margin-top:15px;
-        font-size:14px;
       }
 
       .switch a{
@@ -145,15 +119,21 @@ function Login() {
 
         <div className="auth-card">
 
-          <div className="title">Employee Portal Login</div>
-
-          {error && <div className="error">{error}</div>}
+          <div className="title">Create Account</div>
 
           <input
             className="input"
             placeholder="Username"
             onChange={(e) =>
               setForm({ ...form, username: e.target.value })
+            }
+          />
+
+          <input
+            className="input"
+            placeholder="Email"
+            onChange={(e) =>
+              setForm({ ...form, email: e.target.value })
             }
           />
 
@@ -168,14 +148,14 @@ function Login() {
 
           <button
             className="btn"
-            onClick={handleLogin}
+            onClick={register}
             disabled={loading}
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? "Creating..." : "Register"}
           </button>
 
           <div className="switch">
-            Don't have an account? <Link to="/register">Register</Link>
+            Already have an account? <Link to="/">Login</Link>
           </div>
 
         </div>
@@ -185,4 +165,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Register;

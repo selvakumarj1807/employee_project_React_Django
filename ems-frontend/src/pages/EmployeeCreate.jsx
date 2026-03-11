@@ -3,202 +3,287 @@ import { useNavigate, useParams } from "react-router-dom";
 import api from "../api/axios";
 
 function EmployeeCreate() {
-    const navigate = useNavigate();
-    const { id } = useParams();
+  const navigate = useNavigate();
+  const { id } = useParams();
 
-    const [forms, setForms] = useState([]);
-    const [selectedForm, setSelectedForm] = useState(null);
-    const [formId, setFormId] = useState("");
-    const [formData, setFormData] = useState({});
-    const [loading, setLoading] = useState(false);
+  const [forms, setForms] = useState([]);
+  const [selectedForm, setSelectedForm] = useState(null);
+  const [formId, setFormId] = useState("");
+  const [formData, setFormData] = useState({});
+  const [loading, setLoading] = useState(false);
 
-    /* ========= LOAD FORMS ========= */
-    useEffect(() => {
-        api.get("forms/").then((res) => setForms(res.data));
-    }, []);
+  /* LOAD FORMS */
+  useEffect(() => {
+    api.get("forms/").then((res) => setForms(res.data));
+  }, []);
 
-    /* ========= LOAD EMPLOYEE (EDIT MODE) ========= */
-    useEffect(() => {
-        if (id) {
-            api.get(`employees/${id}/`).then((res) => {
-                setFormId(res.data.form);
-                setFormData(res.data.data);
-            });
-        }
-    }, [id]);
+  /* LOAD EMPLOYEE */
+  useEffect(() => {
+    if (id) {
+      api.get(`employees/${id}/`).then((res) => {
+        setFormId(res.data.form);
+        setFormData(res.data.data);
+      });
+    }
+  }, [id]);
 
-    /* ========= SET SELECTED FORM ========= */
-    useEffect(() => {
-        const form = forms.find((f) => f.id == formId);
-        setSelectedForm(form);
-    }, [formId, forms]);
+  /* SET SELECTED FORM */
+  useEffect(() => {
+    const form = forms.find((f) => f.id == formId);
+    setSelectedForm(form);
+  }, [formId, forms]);
 
-    /* ========= HANDLE INPUT ========= */
-    const handleChange = (label, value) => {
-        setFormData({ ...formData, [label]: value });
+  /* HANDLE INPUT */
+  const handleChange = (label, value) => {
+    setFormData({ ...formData, [label]: value });
+  };
+
+  /* SUBMIT */
+  const handleSubmit = async () => {
+    if (!formId) return alert("Please select a form");
+
+    setLoading(true);
+
+    const payload = {
+      form: formId,
+      data: formData,
     };
 
-    /* ========= SUBMIT ========= */
-    const handleSubmit = async () => {
-        if (!formId) return alert("Please select a form");
+    try {
+      if (id) {
+        await api.put(`employees/${id}/`, payload);
+        alert("Employee Updated Successfully");
+      } else {
+        await api.post("employees/", payload);
+        alert("Employee Created Successfully");
+      }
 
-        setLoading(true);
+      navigate("/employees");
+    } catch {
+      alert("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        const payload = {
-            form: formId,
-            data: formData,
-        };
+  return (
+    <>
+      <style>{`
 
-        try {
-            if (id) {
-                await api.put(`employees/${id}/`, payload);
-                alert("Employee Updated Successfully");
-            } else {
-                await api.post("employees/", payload);
-                alert("Employee Created Successfully");
-            }
-            navigate("/employees");
-        } catch {
-            alert("Something went wrong");
-        } finally {
-            setLoading(false);
+      body{
+        background:#f4f6fb;
+        margin:0;
+        font-family:Segoe UI;
+      }
+
+      .container{
+        max-width:900px;
+        margin:auto;
+        padding:20px;
+      }
+
+      .card{
+        background:white;
+        padding:30px;
+        border-radius:18px;
+        box-shadow:0 15px 35px rgba(0,0,0,0.08);
+        animation:fadeIn .5s ease;
+      }
+
+      @keyframes fadeIn{
+        from{opacity:0; transform:translateY(15px);}
+        to{opacity:1; transform:translateY(0);}
+      }
+
+      .header{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:20px;
+      }
+
+      .title{
+        font-weight:700;
+        margin:0;
+      }
+
+      .back{
+        text-decoration:none;
+        background:#6366f1;
+        color:white;
+        padding:8px 14px;
+        border-radius:8px;
+        font-size:14px;
+      }
+
+      .form-group{
+        margin-bottom:18px;
+      }
+
+      label{
+        font-weight:600;
+        margin-bottom:5px;
+        display:block;
+      }
+
+      input,select{
+        width:100%;
+        padding:10px 12px;
+        border-radius:10px;
+        border:1px solid #ddd;
+        font-size:14px;
+        transition:.25s;
+      }
+
+      input:focus,select:focus{
+        outline:none;
+        border-color:#6366f1;
+        box-shadow:0 0 0 2px rgba(99,102,241,.2);
+      }
+
+      .grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        column-gap:50px;
+      }
+
+      .submit-btn{
+        width:100%;
+        border:none;
+        padding:12px;
+        border-radius:12px;
+        background:#6366f1;
+        color:white;
+        font-weight:600;
+        margin-top:15px;
+        cursor:pointer;
+        transition:.25s;
+      }
+
+      .submit-btn:hover{
+        background:#4f46e5;
+        transform:translateY(-2px);
+      }
+
+      .submit-btn:disabled{
+        opacity:.7;
+        cursor:not-allowed;
+      }
+
+      .empty{
+        text-align:center;
+        color:#777;
+        padding:20px;
+      }
+
+      /* MOBILE */
+
+      @media(max-width:768px){
+
+        .grid{
+          grid-template-columns:1fr;
         }
-    };
 
-    return (
-        <>
-            <style>{`
-        .page-wrapper{
-          min-height:100vh;
-          background:#f1f5f9;
-          padding:30px 15px;
+        .card{
+          padding:20px;
         }
 
-        .form-card{
-          max-width:700px;
-          margin:auto;
-          background:white;
-          padding:35px;
-          border-radius:20px;
-          box-shadow:0 15px 40px rgba(0,0,0,0.08);
-          animation:fadeIn .5s ease;
+        .header{
+          flex-direction:column;
+          align-items:flex-start;
+          gap:10px;
         }
 
-        @keyframes fadeIn{
-          from{opacity:0; transform:translateY(15px);}
-          to{opacity:1; transform:translateY(0);}
-        }
+      }
 
-        .title{
-          font-weight:700;
-          text-align:center;
-          margin-bottom:25px;
-        }
-
-        .form-control{
-          border-radius:12px;
-          height:45px;
-          transition:.25s;
-        }
-
-        .form-control:focus{
-          border-color:#6366f1;
-          box-shadow:0 0 0 0.15rem rgba(99,102,241,.25);
-        }
-
-        label{
-          font-weight:600;
-          margin-bottom:5px;
-        }
-
-        .submit-btn{
-          width:100%;
-          border:none;
-          padding:12px;
-          border-radius:12px;
-          background:#6366f1;
-          color:white;
-          font-weight:600;
-          transition:.3s;
-          margin-top:10px;
-        }
-
-        .submit-btn:hover{
-          background:#4f46e5;
-          transform:translateY(-2px);
-        }
-
-        .submit-btn:disabled{
-          opacity:.7;
-          cursor:not-allowed;
-        }
-
-        .select-box{
-          height:48px;
-          border-radius:12px;
-        }
-
-        @media(max-width:576px){
-          .form-card{
-            padding:25px;
-          }
-        }
       `}</style>
-            <a href="/dashboard" className="btn btn-primary mb-3"><button>Dashboard</button></a>
 
-            <div className="page-wrapper">
-                <div className="form-card">
-                    <h3 className="title">
-                        {id ? "Update Employee" : "Create Employee"}
-                    </h3>
+      <div className="container">
 
-                    {/* FORM SELECT */}
-                    <select
-                        className="form-control select-box mb-3"
-                        value={formId}
-                        onChange={(e) => setFormId(e.target.value)}
-                    >
-                        <option value="">Select Form Template</option>
-                        {forms.map((form) => (
-                            <option key={form.id} value={form.id}>
-                                {form.name}
-                            </option>
-                        ))}
-                    </select>
+        <div className="card">
 
-                    {/* DYNAMIC FIELDS */}
-                    {selectedForm &&
-                        selectedForm.fields.map((field) => (
-                            <div key={field.id} className="mb-3">
-                                <label>{field.label}</label>
+          <div className="header">
+            <h3 className="title">
+              {id ? "Update Employee" : "Create Employee"}
+            </h3>
 
-                                <input
-                                    type={field.field_type}
-                                    className="form-control"
-                                    value={formData[field.label] || ""}
-                                    onChange={(e) =>
-                                        handleChange(field.label, e.target.value)
-                                    }
-                                />
-                            </div>
-                        ))}
+            <a href="/dashboard" className="back">
+              ← Dashboard
+            </a>
+          </div>
 
-                    {/* SUBMIT */}
-                    <button
-                        className="submit-btn"
-                        onClick={handleSubmit}
-                        disabled={loading}
-                    >
-                        {loading
-                            ? "Saving..."
-                            : id
-                                ? "Update Employee"
-                                : "Create Employee"}
-                    </button>
+          {/* FORM TEMPLATE */}
+
+          <div className="form-group">
+            <label>Select Form Template</label>
+
+            <select
+              value={formId}
+              onChange={(e) => setFormId(e.target.value)}
+            >
+              <option value="">Select Form</option>
+
+              {forms.map((form) => (
+                <option key={form.id} value={form.id}>
+                  {form.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* DYNAMIC FIELDS */}
+
+          {selectedForm ? (
+
+            <div className="grid">
+
+              {selectedForm.fields.map((field) => (
+
+                <div key={field.id} className="form-group">
+
+                  <label>{field.label}</label>
+
+                  <input
+                    type={field.field_type}
+                    value={formData[field.label] || ""}
+                    onChange={(e) =>
+                      handleChange(field.label, e.target.value)
+                    }
+                  />
+
                 </div>
+
+              ))}
+
             </div>
-        </>
-    );
+
+          ) : (
+
+            <div className="empty">
+              Select a form template to load fields
+            </div>
+
+          )}
+
+          {/* SUBMIT */}
+
+          <button
+            className="submit-btn"
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {loading
+              ? "Saving..."
+              : id
+              ? "Update Employee"
+              : "Create Employee"}
+          </button>
+
+        </div>
+
+      </div>
+    </>
+  );
 }
 
 export default EmployeeCreate;
