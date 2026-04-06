@@ -4,31 +4,22 @@ import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
   const navigate = useNavigate();
-
-  const [form, setForm] = useState({
-    username: "",
-    password: "",
-  });
-
+  const [form, setForm] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault(); // Added to handle form submission properly
     setError("");
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        "http://127.0.0.1:8000/api/auth/login/",
-        form
-      );
-
+      const res = await axios.post("http://127.0.0.1:8000/api/auth/login/", form);
       localStorage.setItem("access", res.data.access);
       localStorage.setItem("refresh", res.data.refresh);
-
       navigate("/dashboard");
     } catch {
-      setError("Invalid username or password");
+      setError("Invalid credentials. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -37,149 +28,220 @@ function Login() {
   return (
     <>
       <style>{`
-
-      *{box-sizing:border-box;font-family:Segoe UI}
-
-      body{
-        margin:0;
-        background:linear-gradient(135deg,#667eea,#764ba2);
-      }
-
-      .auth-container{
-        min-height:100vh;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        padding:20px;
-      }
-
-      .auth-card{
-        width:100%;
-        max-width:420px;
-        background:white;
-        border-radius:16px;
-        padding:40px 30px;
-        box-shadow:0 15px 40px rgba(0,0,0,.2);
-        animation:fade .4s ease;
-      }
-
-      @keyframes fade{
-        from{opacity:0;transform:translateY(15px)}
-        to{opacity:1;transform:translateY(0)}
-      }
-
-      .title{
-        text-align:center;
-        font-size:26px;
-        font-weight:700;
-        margin-bottom:25px;
-      }
-
-      .input{
-        width:100%;
-        height:46px;
-        padding:10px 14px;
-        border-radius:10px;
-        border:1px solid #ddd;
-        margin-bottom:15px;
-        font-size:14px;
-      }
-
-      .input:focus{
-        outline:none;
-        border-color:#667eea;
-        box-shadow:0 0 0 2px rgba(102,126,234,.2);
-      }
-
-      .btn{
-        width:100%;
-        height:46px;
-        border:none;
-        border-radius:10px;
-        background:linear-gradient(135deg,#667eea,#764ba2);
-        color:white;
-        font-weight:600;
-        cursor:pointer;
-      }
-
-      .btn:hover{
-        transform:translateY(-2px);
-      }
-
-      .btn:disabled{
-        opacity:.7;
-      }
-
-      .error{
-        color:red;
-        text-align:center;
-        margin-bottom:10px;
-        font-size:14px;
-      }
-
-      .switch{
-        text-align:center;
-        margin-top:15px;
-        font-size:14px;
-      }
-
-      .switch a{
-        color:#667eea;
-        text-decoration:none;
-        font-weight:600;
-      }
-
-      .switch a:hover{
-        text-decoration:underline;
-      }
-
-      @media(max-width:480px){
-        .auth-card{
-          padding:30px 20px;
+        :root {
+          --primary: #4f46e5;
+          --primary-hover: #4338ca;
+          --bg: #f8fafc;
+          --text-main: #1e293b;
+          --text-muted: #64748b;
         }
-      }
 
+        .auth-page {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: var(--bg);
+          background-image: radial-gradient(circle at 2px 2px, #e2e8f0 1px, transparent 0);
+          background-size: 40px 40px;
+          font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .login-card {
+          background: white;
+          width: 100%;
+          max-width: 400px;
+          padding: 40px;
+          border-radius: 20px;
+          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+          border: 1px solid #e2e8f0;
+        }
+
+        .header {
+          text-align: center;
+          margin-bottom: 32px;
+        }
+
+        .logo-box {
+          width: 48px;
+          height: 48px;
+          background: var(--primary);
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 16px;
+          color: white;
+          font-weight: bold;
+          font-size: 24px;
+        }
+
+        .header h1 {
+          color: var(--text-main);
+          font-size: 24px;
+          font-weight: 700;
+          margin: 0;
+        }
+
+        .header p {
+          color: var(--text-muted);
+          font-size: 14px;
+          margin-top: 8px;
+        }
+
+        .form-group {
+          margin-bottom: 20px;
+        }
+
+        .form-group label {
+          display: block;
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--text-main);
+          margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+          position: relative;
+        }
+
+        .input-field {
+          width: 100%;
+          padding: 12px 16px;
+          border-radius: 10px;
+          border: 1px solid #cbd5e1;
+          font-size: 15px;
+          transition: all 0.2s;
+          box-sizing: border-box;
+        }
+
+        .input-field:focus {
+          outline: none;
+          border-color: var(--primary);
+          box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .error-banner {
+          background: #fef2f2;
+          color: #dc2626;
+          padding: 12px;
+          border-radius: 8px;
+          font-size: 13px;
+          margin-bottom: 20px;
+          border: 1px solid #fee2e2;
+          text-align: center;
+        }
+
+        .submit-btn {
+          width: 100%;
+          padding: 12px;
+          background: var(--primary);
+          color: white;
+          border: none;
+          border-radius: 10px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.2s;
+          margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+          background: var(--primary-hover);
+        }
+
+        .submit-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .footer-links {
+          margin-top: 24px;
+          text-align: center;
+          font-size: 14px;
+          color: var(--text-muted);
+        }
+
+        .footer-links a {
+          color: var(--primary);
+          text-decoration: none;
+          font-weight: 600;
+        }
+
+        .footer-links a:hover {
+          text-decoration: underline;
+        }
+
+        .flex-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+
+        .remember-me {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 13px;
+          color: var(--text-muted);
+        }
       `}</style>
 
-      <div className="auth-container">
-
-        <div className="auth-card">
-
-          <div className="title">Employee Portal Login</div>
-
-          {error && <div className="error">{error}</div>}
-
-          <input
-            className="input"
-            placeholder="Username"
-            onChange={(e) =>
-              setForm({ ...form, username: e.target.value })
-            }
-          />
-
-          <input
-            type="password"
-            className="input"
-            placeholder="Password"
-            onChange={(e) =>
-              setForm({ ...form, password: e.target.value })
-            }
-          />
-
-          <button
-            className="btn"
-            onClick={handleLogin}
-            disabled={loading}
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-
-          <div className="switch">
-            Don't have an account? <Link to="/register">Register</Link>
+      <div className="auth-page">
+        <div className="login-card">
+          <div className="header">
+            <h1>Welcome Back</h1>
+            <p>Enter your credentials to access your portal</p>
           </div>
 
-        </div>
+          {error && <div className="error-banner">{error}</div>}
 
+          <form onSubmit={handleLogin}>
+            <div className="form-group">
+              <label>Username</label>
+              <div className="input-wrapper">
+                <input
+                  type="text"
+                  className="input-field"
+                  placeholder="e.g. johndoe"
+                  required
+                  onChange={(e) => setForm({ ...form, username: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>Password</label>
+              <div className="input-wrapper">
+                <input
+                  type="password"
+                  className="input-field"
+                  placeholder="••••••••"
+                  required
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="flex-row">
+              <label className="remember-me">
+                <input type="checkbox" /> Remember me
+              </label>
+              <div className="footer-links" style={{marginTop: 0}}>
+                <a href="#">Forgot password?</a>
+              </div>
+            </div>
+
+            <button type="submit" className="submit-btn" disabled={loading}>
+              {loading ? "Signing in..." : "Sign In"}
+            </button>
+          </form>
+
+          <div className="footer-links">
+            Don't have an account? <Link to="/register">Create an account</Link>
+          </div>
+        </div>
       </div>
     </>
   );

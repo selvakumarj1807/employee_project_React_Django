@@ -6,47 +6,35 @@ function Dashboard() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [open, setOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [profile, setProfile] = useState(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   const menu = [
-    { name: "Form Builder", path: "/form-builder" },
-    { name: "Create Employee", path: "/employee-create" },
-    { name: "Employees", path: "/employees" },
+    { name: "Dashboard", path: "/dashboard", icon: "📊" },
+    { name: "Form Builder", path: "/form-builder", icon: "📝" },
+    { name: "Create Employee", path: "/employee-create", icon: "👤" },
+    { name: "Employees", path: "/employees", icon: "👥" },
   ];
 
-  /* ===================== LOAD PROFILE ===================== */
-
   useEffect(() => {
-    api
-      .get("auth/profile/")
+    api.get("auth/profile/")
       .then((res) => setProfile(res.data))
       .catch(() => logout());
   }, []);
 
-  /* ===================== LOGOUT ===================== */
-
   const logout = () => {
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
+    localStorage.clear();
     navigate("/");
   };
-
-  /* ===================== CHANGE PASSWORD ===================== */
 
   const changePassword = async () => {
     const old_password = prompt("Enter Old Password");
     const new_password = prompt("Enter New Password");
-
     if (!old_password || !new_password) return;
 
     try {
-      await api.put("auth/change-password/", {
-        old_password,
-        new_password,
-      });
-
+      await api.put("auth/change-password/", { old_password, new_password });
       alert("Password changed successfully");
     } catch {
       alert("Password change failed");
@@ -56,267 +44,262 @@ function Dashboard() {
   return (
     <>
       <style>{`
-
-      *{
-        box-sizing:border-box;
-        font-family:"Segoe UI",sans-serif;
-      }
-
-      body{
-        margin:0;
-        background:#f4f6f9;
-      }
-
-      .layout{
-        display:flex;
-        min-height:100vh;
-      }
-
-      /* SIDEBAR */
-
-      .sidebar{
-        width:260px;
-        background:linear-gradient(180deg,#1f2937,#111827);
-        color:white;
-        padding:25px 20px;
-        transition:0.3s;
-      }
-
-      .logo{
-        font-size:22px;
-        font-weight:700;
-        margin-bottom:25px;
-        border-bottom:1px solid rgba(255,255,255,0.1);
-        padding-bottom:10px;
-      }
-
-      .menu-link{
-        display:block;
-        padding:12px 15px;
-        margin-bottom:10px;
-        border-radius:10px;
-        text-decoration:none;
-        color:#d1d5db;
-        transition:0.25s;
-      }
-
-      .menu-link:hover{
-        background:rgba(255,255,255,0.08);
-        color:white;
-        transform:translateX(5px);
-      }
-
-      .active-link{
-        background:#4f46e5;
-        color:white !important;
-        font-weight:600;
-      }
-
-      /* CONTENT */
-
-      .content{
-        flex:1;
-        padding:25px;
-      }
-
-      /* TOPBAR */
-
-      .topbar{
-        background:white;
-        padding:12px 18px;
-        border-radius:12px;
-        margin-bottom:20px;
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        box-shadow:0 3px 12px rgba(0,0,0,0.05);
-      }
-
-      .menu-btn{
-        border:none;
-        background:#4f46e5;
-        color:white;
-        padding:8px 14px;
-        border-radius:8px;
-        font-size:16px;
-        display:none;
-      }
-
-      /* PROFILE */
-
-      .profile-box{
-        position:relative;
-        cursor:pointer;
-        font-weight:600;
-      }
-
-      .profile-menu{
-        position:absolute;
-        right:0;
-        top:40px;
-        background:white;
-        border-radius:10px;
-        box-shadow:0 5px 15px rgba(0,0,0,0.1);
-        overflow:hidden;
-      }
-
-      .profile-menu button{
-        display:block;
-        width:180px;
-        border:none;
-        padding:10px 15px;
-        background:white;
-        text-align:left;
-        cursor:pointer;
-      }
-
-      .profile-menu button:hover{
-        background:#f1f5f9;
-      }
-
-      /* CARDS */
-
-      .grid{
-        display:grid;
-        grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-        gap:20px;
-      }
-
-      .card{
-        background:white;
-        padding:25px;
-        border-radius:15px;
-        box-shadow:0 5px 20px rgba(0,0,0,0.05);
-        transition:0.3s;
-      }
-
-      .card:hover{
-        transform:translateY(-5px);
-      }
-
-      .card h3{
-        margin:0;
-        font-size:26px;
-        color:#4f46e5;
-      }
-
-      .card p{
-        margin-top:8px;
-        color:#6b7280;
-      }
-
-      /* MOBILE */
-
-      @media(max-width:768px){
-
-        .sidebar{
-          position:fixed;
-          left:${open ? "0" : "-260px"};
-          top:0;
-          height:100%;
-          z-index:1000;
+        :root {
+          --primary: #4f46e5;
+          --sidebar-bg: #0f172a;
+          --body-bg: #f8fafc;
+          --card-border: #e2e8f0;
+          --text-main: #1e293b;
+          --text-muted: #64748b;
         }
 
-        .menu-btn{
-          display:block;
+        * { box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        body { margin: 0; background: var(--body-bg); color: var(--text-main); }
+
+        .dashboard-wrapper { display: flex; min-height: 100vh; }
+
+        /* SIDEBAR */
+        .sidebar {
+          width: 280px;
+          background: var(--sidebar-bg);
+          color: #f8fafc;
+          padding: 30px 20px;
+          display: flex;
+          flex-direction: column;
+          transition: all 0.3s ease;
+          z-index: 1000;
         }
 
-      }
+        .sidebar-brand {
+          font-size: 20px;
+          font-weight: 800;
+          letter-spacing: -0.5px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 40px;
+          padding-left: 10px;
+        }
 
+        .brand-icon {
+          width: 32px; height: 32px;
+          background: var(--primary);
+          border-radius: 8px;
+          display: flex; align-items: center; justify-content: center;
+        }
+
+        .nav-item {
+          text-decoration: none;
+          color: #94a3b8;
+          padding: 12px 16px;
+          border-radius: 12px;
+          margin-bottom: 6px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          transition: 0.2s;
+          font-weight: 500;
+        }
+
+        .nav-item:hover {
+          background: rgba(255,255,255,0.05);
+          color: white;
+        }
+
+        .nav-active {
+          background: var(--primary) !important;
+          color: white !important;
+          box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        /* MAIN CONTENT */
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+
+        .top-nav {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 30px;
+        }
+
+        .page-title h2 { margin: 0; font-size: 24px; font-weight: 700; }
+        .page-title p { margin: 4px 0 0; color: var(--text-muted); font-size: 14px; }
+
+        /* PROFILE DROPDOWN */
+        .user-menu-container { position: relative; }
+        .user-trigger {
+          display: flex; align-items: center; gap: 10px;
+          padding: 6px 14px;
+          background: white;
+          border: 1px solid var(--card-border);
+          border-radius: 30px;
+          cursor: pointer;
+          transition: 0.2s;
+        }
+        .user-trigger:hover { border-color: var(--primary); }
+        .avatar-circle {
+          width: 32px; height: 32px;
+          background: #e2e8f0;
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 14px; font-weight: 700; color: var(--primary);
+        }
+
+        .dropdown-panel {
+          position: absolute; right: 0; top: 50px;
+          width: 200px;
+          background: white;
+          border-radius: 12px;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+          border: 1px solid var(--card-border);
+          overflow: hidden;
+          z-index: 50;
+        }
+
+        .dropdown-item {
+          width: 100%; border: none; background: none;
+          padding: 12px 16px; text-align: left;
+          font-size: 14px; color: var(--text-main);
+          cursor: pointer; display: flex; align-items: center; gap: 10px;
+        }
+        .dropdown-item:hover { background: #f1f5f9; }
+        .logout-btn { color: #ef4444; }
+
+        /* STAT CARDS */
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 24px;
+        }
+
+        .stat-card {
+          background: white;
+          padding: 24px;
+          border-radius: 16px;
+          border: 1px solid var(--card-border);
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 20px -5px rgba(0,0,0,0.05); }
+
+        .stat-icon {
+          width: 54px; height: 54px;
+          border-radius: 12px;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 24px;
+        }
+
+        .blue-icon { background: #eef2ff; color: #4f46e5; }
+        .green-icon { background: #f0fdf4; color: #22c55e; }
+        .purple-icon { background: #faf5ff; color: #a855f7; }
+        .orange-icon { background: #fff7ed; color: #f97316; }
+
+        .stat-info h3 { margin: 0; font-size: 28px; font-weight: 800; color: var(--text-main); }
+        .stat-info p { margin: 2px 0 0; font-size: 14px; color: var(--text-muted); font-weight: 500; }
+
+        @media (max-width: 900px) {
+          .sidebar { 
+            position: fixed; left: ${isMobileMenuOpen ? "0" : "-280px"}; 
+            height: 100vh;
+          }
+          .mobile-toggle { display: block; }
+        }
       `}</style>
 
-      <div className="layout">
-
+      <div className="dashboard-wrapper">
         {/* SIDEBAR */}
-        <div className="sidebar">
+        <nav className="sidebar">
+          <div className="sidebar-brand">
+            <div className="brand-icon">E</div>
+            <span>EMS PORTAL</span>
+          </div>
 
-          <div className="logo">EMS Panel</div>
-
-          {menu.map((item, i) => (
+          {menu.map((item) => (
             <Link
-              key={i}
+              key={item.path}
               to={item.path}
-              className={`menu-link ${location.pathname === item.path ? "active-link" : ""
-                }`}
-              onClick={() => setOpen(false)}
+              className={`nav-item ${location.pathname === item.path ? "nav-active" : ""}`}
+              onClick={() => setIsMobileMenuOpen(false)}
             >
+              <span>{item.icon}</span>
               {item.name}
             </Link>
           ))}
-        </div>
+        </nav>
 
-        {/* CONTENT */}
-        <div className="content">
+        {/* MAIN CONTENT */}
+        <main className="main-content">
+          <header className="top-nav">
+            <div className="page-title">
+              <h2>Dashboard Overview</h2>
+              <p>Welcome back, {profile?.username || "Admin"}</p>
+            </div>
 
-          <div className="topbar">
-
-            <button
-              className="menu-btn"
-              onClick={() => setOpen(!open)}
-            >
-              ☰
-            </button>
-
-            <h4 style={{ margin: 0 }}>Dashboard</h4>
-
-            {/* PROFILE */}
-            <div
-              className="profile-box"
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
-            >
-              {profile?.username || "User"}
+            <div className="user-menu-container">
+              <div 
+                className="user-trigger" 
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+              >
+                <div className="avatar-circle">
+                  {(profile?.username || "A").charAt(0).toUpperCase()}
+                </div>
+                <span>{profile?.username || "Loading..."}</span>
+                <span style={{ fontSize: '10px' }}>▼</span>
+              </div>
 
               {showProfileMenu && (
-                <div className="profile-menu">
-
-                  <button
-                    onClick={() => navigate("/profile")}
-                  >
-                    My Profile
+                <div className="dropdown-panel">
+                  <button className="dropdown-item" onClick={() => navigate("/profile")}>
+                    👤 My Profile
                   </button>
-
-                  <button onClick={changePassword}>
-                    Change Password
+                  <button className="dropdown-item" onClick={() => navigate("/change-password")}>
+                    🔑 Change Password
                   </button>
-
-                  <button onClick={logout}>
-                    Logout
+                  <hr style={{ border: 'none', borderTop: '1px solid #eee', margin: '4px 0' }} />
+                  <button className="dropdown-item logout-btn" onClick={logout}>
+                    🚪 Logout
                   </button>
-
                 </div>
               )}
             </div>
+          </header>
 
-          </div>
-
-          {/* STAT CARDS */}
-
-          <div className="grid">
-
-            <div className="card">
-              <h3>12</h3>
-              <p>Total Employees</p>
+          <section className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-icon blue-icon">👥</div>
+              <div className="stat-info">
+                <h3>12</h3>
+                <p>Total Employees</p>
+              </div>
             </div>
 
-            <div className="card">
-              <h3>5</h3>
-              <p>Active Forms</p>
+            <div className="stat-card">
+              <div className="stat-icon green-icon">📝</div>
+              <div className="stat-info">
+                <h3>5</h3>
+                <p>Active Forms</p>
+              </div>
             </div>
 
-            <div className="card">
-              <h3>3</h3>
-              <p>Departments</p>
+            <div className="stat-card">
+              <div className="stat-icon purple-icon">🏢</div>
+              <div className="stat-info">
+                <h3>3</h3>
+                <p>Departments</p>
+              </div>
             </div>
 
-            <div className="card">
-              <h3>4</h3>
-              <p>Pending Requests</p>
+            <div className="stat-card">
+              <div className="stat-icon orange-icon">⏳</div>
+              <div className="stat-info">
+                <h3>4</h3>
+                <p>Pending Requests</p>
+              </div>
             </div>
-
-          </div>
-
-        </div>
-
+          </section>
+        </main>
       </div>
     </>
   );
